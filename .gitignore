@@ -1,0 +1,43 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ---- Node / Next ----
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# ---- Env / secrets ----
+.env
+.env.local
+*.local
+
+# ---- Data (large CSVs, uploads, NSE dumps) ----
+# Anchored to repo root so seed data under backend/app/seeds/data/ is kept.
+/data/
+market_moving_news.csv
+merged_results.csv
+results_*.csv
+results.csv
+
+# ---- Legacy script artifacts ----
+checkpoint.json
+checkpoint.txt
+pipeline_debug*.csv
+mapped_results.csv
+
+# ---- OS / editor ----
+.DS_Store
+*.swp
+.idea/
+.vscode/
