@@ -21,3 +21,31 @@ alias_learning.csv
 
 .DS_Store
 .vscode/
+
+# Environment
+.env
+venv/
+__pycache__/
+*.pyc
+
+# Runtime files
+checkpoint.json
+checkpoint.txt
+prompt_cache.json
+
+# Generated outputs
+mapped_results.csv
+merged_results.csv
+pipeline_debug.jsonl
+pipeline_debug_audit.csv
+results.csv
+results_*.csv
+
+# Datasets
+market_moving_news.csv
+nse_companies.csv
+alias_learning.csv
+
+# IDE files
+.vscode/
+.DS_Store
