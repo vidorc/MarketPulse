@@ -22,107 +22,261 @@
 
 ## 📖 Overview
 
-**MarketPulse** is a comprehensive, production-ready full-stack financial intelligence platform designed for investors, financial analysts, and quantitative researchers. It automatically ingests financial news, processes unstructured data using advanced Large Language Models (LLMs), and extracts actionable insights such as company mentions, sentiment analysis, and market impact classifications. 
+**MarketPulse** is a full-stack financial market intelligence platform built for investors, financial analysts, and quantitative researchers. It ingests financial news, processes unstructured content using large language models, and converts it into structured signals such as company mentions, sentiment, and estimated market impact.
 
-Built with scalability and precision in mind, MarketPulse not only provides a powerful analytics dashboard but also features a built-in benchmarking system to continuously evaluate the underlying AI model's Precision, Recall, and F1 scores against human-verified ground truth data.
+The platform also includes a built-in evaluation pipeline, making it possible to benchmark extraction quality over time using Precision, Recall, and F1 score against human-verified ground truth datasets.
 
----
+***
 
 ## ✨ Key Features
 
-* 🤖 **AI-Powered News Processing Pipeline:** Automated ingestion and asynchronous processing of financial news and articles.
-* 📊 **LLM Entity Resolution & Impact Classification:** Utilizes Groq LLMs to accurately extract company mentions, map them to known tickers, and classify market impact.
-* 📈 **Real-Time Sentiment Analysis:** Track positive, negative, and neutral sentiments across targeted equities.
-* 🏢 **Company Explorer:** Deep-dive into specific companies to trace historical mentions and news-driven market movement.
-* ⏱️ **Analytics Dashboard:** A beautiful, responsive interface summarizing key financial metrics, recent intelligence, and system health.
-* 🎯 **Evaluation & Benchmarking:** A robust system tracking model Precision, Recall, and F1 metrics to ensure reliable AI extractions over time.
-* 📝 **Audit Logs & Human-in-the-Loop Corrections:** Tools for data quality assurance, allowing experts to correct model outputs and manage ground truth datasets.
-* 🔐 **Secure Access:** Comprehensive User Authentication with Role-Based Access Control (RBAC).
+- 🤖 **Automated News Processing Pipeline** — Ingests financial articles and processes them asynchronously.
+- 📊 **LLM-Based Entity Resolution** — Extracts company mentions, maps them to known tickers, and classifies impact.
+- 📈 **Sentiment Analysis** — Tracks positive, negative, and neutral sentiment across selected equities.
+- 🏢 **Company Explorer** — Lets users inspect company-specific mention history and related market-moving news.
+- ⏱️ **Analytics Dashboard** — Summarizes intelligence, platform activity, and system health in one place.
+- 🎯 **Benchmarking Suite** — Measures Precision, Recall, and F1 score to monitor model quality.
+- 📝 **Audit Logs & Human Review** — Supports corrections, traceability, and ground truth management.
+- 🔐 **Authentication & RBAC** — Secures access with user authentication and role-based permissions.
 
----
+***
 
 ## 🏗️ Architecture
 
-MarketPulse follows a decoupled microservices-inspired architecture, leveraging asynchronous task queues for heavy LLM workloads.
+MarketPulse follows a decoupled, service-oriented architecture designed to handle expensive AI workloads through asynchronous processing.
 
 ```mermaid
 graph TD
-    subgraph Frontend [Frontend - Next.js 15]
-        UI[User Interface]
-        Pages[Dashboards & Views]
+
+    subgraph Frontend["Frontend - Next.js 15"]
+        UI["User Interface"]
+        Pages["Dashboards & Views"]
         UI --> Pages
     end
 
-    subgraph Backend [Backend - FastAPI]
-        API[RESTful API]
-        Auth[Authentication]
-        Routes[API Routes]
+    subgraph Backend["Backend - FastAPI"]
+        API["REST API"]
+        Auth["Authentication"]
+        Routes["API Routes"]
+
         API --> Auth
         API --> Routes
     end
 
-    subgraph Workers [Asynchronous Processing]
-        Broker[Redis Message Broker]
-        Celery[Celery Workers]
-        LLM[Groq LLM / AI Inference]
+    subgraph Workers["Asynchronous Processing"]
+        Broker["Redis Message Broker"]
+        Celery["Celery Workers"]
+        LLM["Groq LLM / AI Inference"]
+
+        Broker --> Celery
+        Celery --> LLM
     end
 
-    subgraph Data [Data Persistence]
-        DB[(PostgreSQL)]
-        Cache[(Redis Cache)]
+    subgraph Data["Data Persistence"]
+        DB[("PostgreSQL")]
+        Cache[("Redis Cache")]
     end
 
-    Pages -- HTTP/REST --> API
-    Routes -- Read/Write --> DB
-    Routes -- Queue Task --> Broker
-    Broker --> Celery
-    Celery -- Fetch/Store --> DB
-    Celery -- Inference --> LLM
-    Routes -- Cache --> Cache
-💻 Tech StackCategoryTechnologiesFrontendNext.js 15, TypeScript, Tailwind CSS, shadcn/ui, React QueryBackendFastAPI, Python 3.12+, Pydantic, SQLAlchemy, AlembicDatabase & CachePostgreSQL, RedisTask QueueCeleryAI & MLGroq LLM API, Prompt Engineering, Zero-Shot/Few-Shot ClassificationInfrastructureDocker, Docker Compose (Planned)📂 Repository StructurePlaintextMarketPulse/
-├── assets/                 # Static assets and repository imagery
+    Pages -->|HTTP/REST| API
+
+    Routes -->|Read/Write| DB
+    Routes -->|Queue Task| Broker
+    Routes -->|Cache Operations| Cache
+
+    Celery -->|Fetch/Store| DB
+    Celery -->|Inference Request| LLM
+```
+
+### 💻 Tech Stack
+
+| Category | Technologies |
+|----------|--------------|
+| Frontend | Next.js 15, TypeScript, Tailwind CSS, shadcn/ui, React Query |
+| Backend | FastAPI, Python 3.12+, Pydantic, SQLAlchemy, Alembic |
+| Database & Cache | PostgreSQL, Redis |
+| Task Queue | Celery |
+| AI & ML | Groq LLM API, Prompt Engineering, Zero-Shot/Few-Shot Classification |
+| Infrastructure | Docker, Docker Compose (planned) |
+
+***
+
+## 📂 Repository Structure
+
+```text
+MarketPulse/
+├── assets/                 # Static assets and repository visuals
 │   └── marketpulse-banner.png
-├── backend/                # FastAPI application backend
+├── backend/                # FastAPI backend service
 │   ├── alembic/            # Database migrations
-│   ├── app/                # Application source code
+│   ├── app/
 │   │   ├── api/            # Route handlers
-│   │   ├── core/           # Config and security
+│   │   ├── core/           # Settings, auth, security
 │   │   ├── models/         # SQLAlchemy models
-│   │   ├── schemas/        # Pydantic validation models
-│   │   ├── services/       # Business logic & LLM integration
+│   │   ├── schemas/        # Pydantic schemas
+│   │   ├── services/       # Business logic and LLM integration
 │   │   └── worker/         # Celery task definitions
-│   ├── data/               # Seed data & CSVs
+│   ├── data/               # Seed files and CSVs
 │   ├── tests/              # Pytest test suite
-│   ├── .env.example        # Environment variables template
+│   ├── .env.example        # Environment template
 │   └── pyproject.toml      # Python dependencies
-├── docs/                   # Extended documentation
-├── frontend/               # Next.js 15 application
+├── docs/                   # Extended project documentation
+├── frontend/               # Next.js frontend app
 │   ├── src/                # Frontend source code
 │   ├── public/             # Public assets
-│   ├── package.json        # Node.js dependencies
-│   └── tailwind.config.ts  # Tailwind CSS configuration
-└── infra/                  # Infrastructure configurations
-🔌 API Endpoints OverviewThe backend exposes a fully documented OpenAPI (Swagger) interface. Here are the core module routes:ModuleRoute PrefixDescriptionAuthentication/api/v1/authJWT Login, Registration, Password ResetArticles/api/v1/articlesIngest news, query processed articles, upload CSV batchesCompanies/api/v1/companiesCRUD for company entities and ticker resolutionAnalytics/api/v1/analyticsAggregated metrics for dashboardsBenchmarks/api/v1/benchmarksRun evaluations and fetch Precision/Recall/F1 scoresGround Truth/api/v1/ground-truthManage verified datasets for model testingAudit Logs/api/v1/auditTrack human corrections and system actions🚀 Getting StartedPrerequisitesNode.js 20+ & npm/pnpmPython 3.12+PostgreSQL 15+Redis 7+Groq API Key1. Clone the RepositoryBashgit clone [https://github.com/yourusername/MarketPulse.git](https://github.com/yourusername/MarketPulse.git)
+│   ├── package.json        # Node dependencies
+│   └── tailwind.config.ts  # Tailwind configuration
+└── infra/                  # Infrastructure configs
+```
+
+***
+
+## 🔌 API Endpoints Overview
+
+The backend exposes a documented OpenAPI interface. The core route groups are listed below.
+
+| Module | Route Prefix | Description |
+|--------|--------------|-------------|
+| Authentication | `/api/v1/auth` | Login, registration, password reset |
+| Articles | `/api/v1/articles` | Ingest articles, query processed data, upload CSV batches |
+| Companies | `/api/v1/companies` | Company CRUD and ticker resolution |
+| Analytics | `/api/v1/analytics` | Aggregated dashboard metrics |
+| Benchmarks | `/api/v1/benchmarks` | Run evaluations and fetch Precision, Recall, and F1 |
+| Ground Truth | `/api/v1/ground-truth` | Manage verified benchmark datasets |
+| Audit Logs | `/api/v1/audit` | Track corrections and system actions |
+
+***
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 20+ with npm or pnpm
+- Python 3.12+
+- PostgreSQL 15+
+- Redis 7+
+- Groq API key
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/vidorc/MarketPulse.git
 cd MarketPulse
-2. Environment VariablesBackend (backend/.env):Code snippetDATABASE_URL=postgresql://user:password@localhost:5432/marketpulse
+```
+
+### 2. Configure Environment Variables
+
+**Backend (`backend/.env`)**
+
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/marketpulse
 REDIS_URL=redis://localhost:6379/0
 GROQ_API_KEY=gsk_your_groq_api_key_here
 SECRET_KEY=your_super_secret_jwt_key
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-Frontend (frontend/.env.local):Code snippetNEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
-3. Backend Setup & ExecutionNavigate to the backend directory and install dependencies:Bashcd backend
+```
+
+**Frontend (`frontend/.env.local`)**
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8000/api/v1
+```
+
+### 3. Backend Setup
+
+```bash
+cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt # Or poetry install if using Poetry
-Run Database Migrations:Bashalembic upgrade head
-Start the FastAPI Server:Bashuvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-Start the Celery Worker (In a new terminal):Bashcd backend
+pip install -r requirements.txt
+# or: poetry install
+```
+
+Run migrations:
+
+```bash
+alembic upgrade head
+```
+
+Start the API server:
+
+```bash
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Start the Celery worker in a new terminal:
+
+```bash
+cd backend
 source venv/bin/activate
 celery -A app.worker.celery_app worker --loglevel=info
-4. Frontend Setup & ExecutionNavigate to the frontend directory:Bashcd frontend
+```
+
+### 4. Frontend Setup
+
+```bash
+cd frontend
 npm install
 # or
 pnpm install
-Start the Next.js Development Server:Bashnpm run dev
-Open http://localhost:3000 in your browser.📊 Evaluation & BenchmarkingMarketPulse includes a dedicated benchmarking suite to evaluate the reliability of the Groq LLM prompts against human-annotated Ground Truth data.To run a benchmark pipeline:Navigate to the Benchmarks tab in the UI.Select a target Ground Truth dataset.The system dispatches asynchronous tasks via Celery to re-evaluate articles.View updated Precision, Recall, and F1 Scores on the Model Performance dashboard to detect prompt drift or degradation.🛣️ Future Roadmap[ ] Dockerization: Complete docker-compose.yml for one-click deployments.[ ] Real-time WebSockets: Push live news extraction results to the frontend.[ ] Multi-LLM Support: Add fallback support for OpenAI GPT-4o and Anthropic Claude 3.5 Sonnet.[ ] Advanced Graphing: Implement interactive D3.js / Recharts network graphs for company relationships.[ ] Automated Web Scraping: Direct RSS feed integration for continuous news ingestion.🧠 Learning OutcomesBuilding MarketPulse demonstrates expertise in:System Architecture: Designing decoupled applications using message brokers (Redis/Celery) to handle rate-limited external AI APIs.AI Engineering: Applying applied prompt engineering, entity resolution, and deterministic JSON extraction from stochastic LLMs.Full-Stack Development: Connecting modern React ecosystems (Next.js 15) with robust Python backends (FastAPI/SQLAlchemy).Data Quality Engineering: Implementing evaluation metrics (F1, Precision, Recall) traditionally used in ML into generative AI workflows.👨‍💻 AuthorBuilt with ❤️ by [Your Name/Handle]GitHub: @YourUsernameLinkedIn: Your NamePortfolio: yourwebsite.com⭐ Show your supportIf you found this project interesting or helpful, please consider leaving a Star ⭐️! It helps others discover the repository and motivates further open-source contributions.
+```
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+***
+
+## 📊 Evaluation & Benchmarking
+
+MarketPulse includes a dedicated benchmarking workflow to evaluate the reliability of its LLM extraction pipeline against human-annotated ground truth data.
+
+### Benchmark Flow
+
+1. Open the **Benchmarks** section in the UI.
+2. Select a target ground truth dataset.
+3. Dispatch asynchronous re-evaluation tasks through Celery.
+4. Review updated Precision, Recall, and F1 score results on the performance dashboard.
+
+This makes it easier to detect prompt drift, regression, or extraction quality changes over time.
+
+***
+
+## 🛣️ Future Roadmap
+
+- [ ] Dockerization with a complete `docker-compose.yml`
+- [ ] Real-time WebSocket updates for live extraction results
+- [ ] Multi-LLM support with fallback providers
+- [ ] Advanced graph visualizations for company relationships
+- [ ] RSS-based or automated news source ingestion
+
+***
+
+## 🧠 Learning Outcomes
+
+Building MarketPulse demonstrates practical experience in:
+
+- **System Design** — Architecting asynchronous workflows around Redis and Celery.
+- **AI Engineering** — Designing prompts, structured extraction flows, and LLM evaluation loops.
+- **Full-Stack Development** — Integrating a Next.js frontend with a FastAPI backend and relational database.
+- **Data Quality Workflows** — Applying ML-style evaluation metrics inside generative AI systems.
+
+***
+
+## 👨‍💻 Author
+
+Built with ❤️ by **Mayank Sharma**
+
+- GitHub: [@vidorc](https://github.com/vidorc)
+- LinkedIn: [Mayank Sharma](https://www.linkedin.com/in/mayank-sharma1832/)
+- Portfolio: [mayanks-portfolio.vercel.app](https://mayanks-portfolio.vercel.app/)
+
+***
+
+## ⭐ Support
+
+If you found this project useful, consider starring the repository. It helps more people discover the project and supports future development.
