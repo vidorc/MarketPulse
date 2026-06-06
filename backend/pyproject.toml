@@ -4,30 +4,31 @@ version = "2.0.0"
 description = "MarketPulse V2 — AI-powered market intelligence backend"
 requires-python = ">=3.12"
 dependencies = [
-    "fastapi>=0.115",
-    "uvicorn[standard]>=0.32",
-    "sqlalchemy>=2.0.36",
-    "alembic>=1.14",
-    "psycopg[binary]>=3.2",
-    "pydantic>=2.10",
-    "pydantic-settings>=2.6",
-    "python-jose[cryptography]>=3.3",
-    "passlib[bcrypt]>=1.7",
-    "python-multipart>=0.0.12",
-    "celery>=5.4",
-    "redis>=5.2",
-    "groq>=0.13",
-    "pandas>=2.2",
-    "python-dotenv>=1.0",
-    "httpx>=0.27",
+    "fastapi==0.136.3",
+    "uvicorn[standard]==0.48.0",
+    "sqlalchemy==2.0.50",
+    "alembic==1.18.4",
+    "psycopg[binary]==3.3.4",
+    "pydantic==2.13.4",
+    "pydantic-settings==2.14.1",
+    "python-jose[cryptography]==3.5.0",
+    "passlib[bcrypt]==1.7.4",
+    "python-multipart==0.0.29",
+    "celery==5.6.3",
+    "redis==8.0.0",
+    "groq==1.4.0",
+    "pandas==3.0.3",
+    "python-dotenv==1.2.2",
+    "httpx==0.28.1",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=8.3",
-    "pytest-asyncio>=0.24",
-    "ruff>=0.8",
-    "mypy>=1.13",
+    "pytest==9.0.3",
+    "pytest-asyncio==1.4.0",
+    "pytest-cov==6.0.0",
+    "ruff==0.15.15",
+    "mypy==2.1.0",
 ]
 
 [tool.pytest.ini_options]

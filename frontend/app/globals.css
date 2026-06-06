@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   MarketPulse design system — Tailwind CSS v4 (CSS-first @theme).
+   Aesthetic: modern fintech terminal — deep layered dark, refined gold accent,
+   monospace numerics, subtle depth and glow. No config file; tokens below
+   generate the utility classes (bg-*, text-*, border-*, shadow-*, etc.).
+   ========================================================================== */
+
+@theme {
+  /* Fonts (wired to next/font CSS variables in layout.tsx). */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Surface ramp — darkest base to lifted panels. */
+  --color-ground: #06090f;
+  --color-surface: #0a0f17;
+  --color-panel: #0f1620;
+  --color-panel-2: #141c28;
+  --color-elevated: #1a2331;
+
+  /* Hairlines. */
+  --color-line: #1d2733;
+  --color-line-bright: #2a3645;
+
+  /* Text ramp. */
+  --color-ink: #e8eef6;
+  --color-ink-soft: #c4d0de;
+  --color-muted: #6b7a8d;
+  --color-faint: #44505f;
+
+  /* Brand — refined gold, with a warm secondary. */
+  --color-gold: #f5b942;
+  --color-gold-bright: #ffcf6b;
+  --color-gold-dim: #8a6620;
+  --color-azure: #4aa8ff;
+
+  /* Semantic — sentiment / impact. */
+  --color-pos: #34d399;
+  --color-pos-dim: #134e3a;
+  --color-neg: #f8717a;
+  --color-neg-dim: #5c1f24;
+  --color-neu: #8b97a8;
+  --color-high: #f8717a;
+  --color-medium: #fbbf57;
+  --color-low: #34d399;
+
+  /* Radii. */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+
+  /* Shadows — soft elevation + gold glow for primary actions. */
+  --shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -12px rgba(0, 0, 0, 0.6);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, 0.5), 0 16px 40px -16px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 0 1px rgba(245, 185, 66, 0.2), 0 6px 24px -6px rgba(245, 185, 66, 0.35);
+
+  /* Animations. */
+  --animate-fade-in: fade-in 0.4s ease-out both;
+  --animate-rise: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-pulse-dot: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ----------------------------------------------------------------------------
+   Base layer
+   -------------------------------------------------------------------------- */
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background-color: var(--color-base);
+  color: var(--color-ink-soft);
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: 13.5px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Tabular, monospace numerics for aligned financial data. */
+.tnum {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 999px;
+  border: 2px solid var(--color-base);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-line-bright);
+}
+
+::selection {
+  background: rgba(245, 185, 66, 0.25);
+  color: var(--color-ink);
+}
+
+/* ----------------------------------------------------------------------------
+   Reusable composite utilities
+   -------------------------------------------------------------------------- */
+
+/* App background: deep base with a faint gold aurora bleeding from the top. */
+@utility app-bg {
+  background-color: var(--color-base);
+  background-image:
+    radial-gradient(120% 60% at 100% 0%, rgba(245, 185, 66, 0.06), transparent 55%),
+    radial-gradient(80% 50% at 0% 0%, rgba(74, 168, 255, 0.05), transparent 50%);
+}
+
+/* Gold gradient text for brand / hero numbers. */
+@utility text-gold-gradient {
+  background: linear-gradient(135deg, var(--color-gold-bright), var(--color-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Frosted hairline border used on cards. */
+@utility ring-hairline {
+  box-shadow: inset 0 0 0 1px var(--color-line);
+}
+
+/* Animated shimmer fill for skeleton loaders. */
+@utility skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-panel) 25%,
+    var(--color-panel-2) 50%,
+    var(--color-panel) 75%
+  );
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}

@@ -20,6 +20,7 @@ class Company(Base, TimestampMixin):
     primary_ticker_id: Mapped[int | None] = mapped_column(
         ForeignKey("tickers.id", use_alter=True, name="fk_company_primary_ticker"),
         nullable=True,
+        index=True,
     )
 
     primary_ticker: Mapped[Ticker | None] = relationship(
@@ -43,7 +44,9 @@ class Ticker(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     symbol: Mapped[str] = mapped_column(String(64), unique=True, index=True)
-    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"))
+    company_id: Mapped[int] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), index=True
+    )
     series: Mapped[str | None] = mapped_column(String(16), nullable=True)
     isin: Mapped[str | None] = mapped_column(String(32), nullable=True)
     face_value: Mapped[str | None] = mapped_column(String(32), nullable=True)

@@ -14,7 +14,7 @@ class GroundTruth(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     # Either linked to an ingested article, or matched by title for seed labels.
     article_id: Mapped[int | None] = mapped_column(
-        ForeignKey("articles.id", ondelete="SET NULL"), nullable=True
+        ForeignKey("articles.id", ondelete="SET NULL"), nullable=True, index=True
     )
     title: Mapped[str] = mapped_column(Text, index=True)
     # Comma-separated canonical NSE tickers, e.g. "ADANIPORTS,TCS".
@@ -22,7 +22,7 @@ class GroundTruth(Base, TimestampMixin):
     expected_type: Mapped[str | None] = mapped_column(String(48), nullable=True)
     label_source: Mapped[str] = mapped_column(String(16), default=LabelSource.seed.value)
     labeled_by: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
     )
 
 
@@ -31,7 +31,7 @@ class BenchmarkResult(Base, TimestampMixin):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     processing_run_id: Mapped[int | None] = mapped_column(
-        ForeignKey("processing_runs.id", ondelete="SET NULL"), nullable=True
+        ForeignKey("processing_runs.id", ondelete="SET NULL"), nullable=True, index=True
     )
     # "overall" or "per_category"; category set only for per-category rows.
     scope: Mapped[str] = mapped_column(String(16), default="overall")

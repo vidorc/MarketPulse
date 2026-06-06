@@ -23,9 +23,11 @@ class Article(Base, TimestampMixin):
     )
     # Idempotency key: sha256 of normalized title+body. Unique => dedupe.
     content_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
-    status: Mapped[str] = mapped_column(String(16), default=ArticleStatus.pending.value)
+    status: Mapped[str] = mapped_column(
+        String(16), default=ArticleStatus.pending.value, index=True
+    )
     processing_run_id: Mapped[int | None] = mapped_column(
-        ForeignKey("processing_runs.id", ondelete="SET NULL"), nullable=True
+        ForeignKey("processing_runs.id", ondelete="SET NULL"), nullable=True, index=True
     )
 
     processing_run: Mapped["ProcessingRun | None"] = relationship(
@@ -68,10 +70,14 @@ class ArticleCompany(Base, TimestampMixin):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    article_id: Mapped[int] = mapped_column(ForeignKey("articles.id", ondelete="CASCADE"))
-    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"))
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("articles.id", ondelete="CASCADE"), index=True
+    )
+    company_id: Mapped[int] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), index=True
+    )
     ticker_id: Mapped[int | None] = mapped_column(
-        ForeignKey("tickers.id", ondelete="SET NULL"), nullable=True
+        ForeignKey("tickers.id", ondelete="SET NULL"), nullable=True, index=True
     )
     alias_used: Mapped[str | None] = mapped_column(String(512), nullable=True)
     confidence: Mapped[int] = mapped_column(Integer, default=0)
@@ -89,8 +95,12 @@ class Sentiment(Base, TimestampMixin):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    article_id: Mapped[int] = mapped_column(ForeignKey("articles.id", ondelete="CASCADE"))
-    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"))
+    article_id: Mapped[int] = mapped_column(
+        ForeignKey("articles.id", ondelete="CASCADE"), index=True
+    )
+    company_id: Mapped[int] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), index=True
+    )
     label: Mapped[str] = mapped_column(String(16))
     score: Mapped[float | None] = mapped_column(Float, nullable=True)
 

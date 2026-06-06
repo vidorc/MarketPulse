@@ -14,7 +14,7 @@ class AuditLog(Base, TimestampMixin):
     id: Mapped[int] = mapped_column(primary_key=True)
     # Null actor => system/pipeline event.
     actor_id: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True, index=True
     )
     entity_type: Mapped[str] = mapped_column(String(64), index=True)
     entity_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)

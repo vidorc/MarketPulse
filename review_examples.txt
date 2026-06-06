@@ -1,0 +1,161 @@
+====================================================================================================
+TITLE: Sensex, Nifty fail to hold gains, slip in red weighed by tech, metal stocks
+
+LLM OUTPUT:
+- Bajaj Auto
+- M&M
+
+FINAL MAPPED COMPANIES:
+- Bajaj Auto Limited (BAJAJ-AUTO)
+- Mahindra & Mahindra Limited (M&M)
+
+====================================================================================================
+TITLE: Gillette India’s stock surges 10% on strong grooming segment sales
+
+LLM OUTPUT:
+- Gillette India
+
+FINAL MAPPED COMPANIES:
+- Gillette India Limited (GILLETTE)
+
+====================================================================================================
+TITLE: Market shows strong momentum ahead of FOMC meeting; trade with positive bias, say experts
+
+LLM OUTPUT:
+- Indian Oil Corporation
+- Motilal Oswal Financial Services
+- Adani Ports and Special Economic Zone
+- JM Financial Market
+
+FINAL MAPPED COMPANIES:
+- Motilal Oswal Financial Services Limited (MOTILALOFS)
+- Adani Ports and Special Economic Zone Limited (ADANIPORTS)
+
+====================================================================================================
+TITLE: Indian Oil Q4 net profit falls 49% to Rs 5,488 crore; declares dividend of Rs 7/share
+
+LLM OUTPUT:
+- Indian Oil Corporation
+
+FINAL MAPPED COMPANIES:
+- None
+
+====================================================================================================
+TITLE: Adani Ports Q4 preview: High volumes set to boost revenue, EBITDA; all eyes on Red Sea impact
+
+LLM OUTPUT:
+- Adani Ports and Special Economic Zone
+
+FINAL MAPPED COMPANIES:
+- Adani Ports and Special Economic Zone Limited (ADANIPORTS)
+
+====================================================================================================
+TITLE: Chartist Talks: Jigar Patel sees Bank Nifty at 51,000-52,000 by mid-May
+
+LLM OUTPUT:
+- Indian Oil Corporation
+- Adani Ports and Special Economic Zone
+
+FINAL MAPPED COMPANIES:
+- Adani Ports and Special Economic Zone Limited (ADANIPORTS)
+
+====================================================================================================
+TITLE: Fino Payments Bank Q4 net profit jumps 14% to Rs 25.2 crore
+
+LLM OUTPUT:
+- Reserve Bank of India
+- Fino Payments Bank
+
+FINAL MAPPED COMPANIES:
+- Fino Payments Bank Limited (FINOPB)
+
+====================================================================================================
+TITLE: Taking Stock: Nifty fails to hold on to record high; Sensex down 189 points
+
+LLM OUTPUT:
+- Zen Technologies
+- LIC Housing Finance
+- Samvardhana Motherson International
+- ICICI Bank
+- Muthoot Finance
+- Axis Bank
+- Polycab India
+- BPCL
+- Shakti Pumps
+- BHEL
+- Aditya Birla Capital
+- Usha Martin
+- Grasim Industries
+- Vesuvius India
+- Power Grid Corporation
+- Eicher Motors
+- Tech Mahindra
+- Trent
+- Shriram Finance
+- M&M
+- SBI
+- HCL Technologies
+- Tejas Networks
+- Supreme Industries
+- JSW Steel
+- Birlasoft
+- IOC
+- Jubilant Foodworks
+- Godrej Industries
+- Sun Pharma
+- TEC
+- Exide Industries
+- Ashok Leyland
+- Just Dial
+
+FINAL MAPPED COMPANIES:
+- Zen Technologies Limited (ZENTEC)
+- LIC Housing Finance Limited (LICHSGFIN)
+- Samvardhana Motherson International Limited (MOTHERSON)
+- ICICI Bank Limited (ICICIBANK)
+- Muthoot Finance Limited (MUTHOOTFIN)
+- Axis Bank Limited (AXISBANK)
+- Polycab India Limited (POLYCAB)
+- Bharat Petroleum Corporation Limited (BPCL)
+- Bharat Heavy Electricals Limited (BHEL)
+- Aditya Birla Capital Limited (ABCAPITAL)
+- Usha Martin Limited (USHAMART)
+- Grasim Industries Limited (GRASIM)
+- Vesuvius India Limited (VESUVIUS)
+- Eicher Motors Limited (EICHERMOT)
+- Tech Mahindra Limited (TECHM)
+- Trent Limited (TRENT)
+- Shriram Finance Limited (SHRIRAMFIN)
+- Mahindra & Mahindra Limited (M&M)
+- State Bank of India (SBIN)
+- HCL Technologies Limited (HCLTECH)
+- Tejas Networks Limited (TEJASNET)
+- Supreme Industries Limited (SUPREMEIND)
+- JSW Steel Limited (JSWSTEEL)
+- BIRLASOFT LIMITED (BSOFT)
+- Indian Oil Corporation Limited (IOC)
+- Jubilant Foodworks Limited (JUBLFOOD)
+- Godrej Industries Limited (GODREJIND)
+- Exide Industries Limited (EXIDEIND)
+- Ashok Leyland Limited (ASHOKLEY)
+- Just Dial Limited (JUSTDIAL)
+
+====================================================================================================
+TITLE: Nifty, Nifty Bank retreat after hutting all-time high. Next stop?
+
+LLM OUTPUT:
+- None
+
+FINAL MAPPED COMPANIES:
+- None
+
+====================================================================================================
+TITLE: NHPC m-cap nears Rs 1 lakh crore on tie-up with Norwegian firm for floating solar tech
+
+LLM OUTPUT:
+- NHPC
+- Ocean Sun
+
+FINAL MAPPED COMPANIES:
+- NHPC Limited (NHPC)
+

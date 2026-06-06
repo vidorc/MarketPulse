@@ -12,7 +12,9 @@ class Alias(Base, TimestampMixin):
     __tablename__ = "aliases"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    company_id: Mapped[int] = mapped_column(ForeignKey("companies.id", ondelete="CASCADE"))
+    company_id: Mapped[int] = mapped_column(
+        ForeignKey("companies.id", ondelete="CASCADE"), index=True
+    )
     alias_text: Mapped[str] = mapped_column(String(512))
     # Normalized form is the lookup key; unique so resolution is deterministic.
     normalized: Mapped[str] = mapped_column(String(512), unique=True, index=True)
