@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     ENV: Literal["dev", "test", "prod"] = "dev"
     API_V1_PREFIX: str = "/api/v1"
     # Comma-separated origins; "*" allows all (dev only).
-    CORS_ORIGINS: str = "http://localhost:3000"
+    CORS_ORIGINS: str = "http://localhost:3000,http://localhost:3001"
 
     # --- Database ---
     DATABASE_URL: str = "postgresql+psycopg://marketpulse:marketpulse@localhost:5432/marketpulse"

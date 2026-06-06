@@ -49,3 +49,7 @@ alias_learning.csv
 # IDE files
 .vscode/
 .DS_Store
+results.csv
+mapped_results.csv
+pipeline_debug*
+checkpoint.json
