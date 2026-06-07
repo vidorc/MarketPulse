@@ -6,7 +6,10 @@ import logging
 import pandas as pd
 from typing import Dict, List, Tuple
 from dotenv import load_dotenv
-from openai import OpenAI
+
+# 🎯 NEW: Import the modern Google GenAI SDK
+from google import genai
+from google.genai import types
 
 # =====================================================================
 # MODULE 1 — CONFIGURATION & SETUP
@@ -15,13 +18,14 @@ CONFIG = {
     "INPUT_FILE": "market_moving_news.csv",
     "COMPANY_FILE": "nse_companies.csv",
     "OUTPUT_FILE": "mapped_results.csv",
-    "DEBUG_FILE": "pipeline_debug.jsonl", 
+    "DEBUG_FILE": "pipeline_debug.jsonl",  
     "GROUND_TRUTH_FILE": "ground_truth.csv",
     "BENCHMARK_BREAKDOWN_FILE": "benchmark_breakdown.csv",
     "CHECKPOINT_FILE": "checkpoint.json",
     
-    "MODEL": "deepseek/deepseek-chat",  
-    "PROMPT_VERSION": "v8_openrouter_deepseek_strict_materiality", # 🎯 Updated tracking   
+    # 🎯 UPDATED: Using the latest supported Gemini 2.5 Flash model
+    "MODEL": "gemini-2.5-flash",  
+    "PROMPT_VERSION": "v12_few_shot_gemini_new_sdk",    
     
     "BATCH_SIZE": 10,                 
     "MAX_RETRIES": 5,
@@ -32,18 +36,12 @@ CONFIG = {
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 load_dotenv()
 
-api_key = os.getenv("OPENROUTER_API_KEY")
+# 🎯 Initialize the new Gemini Client
+api_key = os.getenv("GEMINI_API_KEY")
 if not api_key:
-    raise ValueError("OPENROUTER_API_KEY missing from .env file.")
+    raise ValueError("GEMINI_API_KEY missing from .env file.")
 
-client = OpenAI(
-    base_url="https://openrouter.ai/api/v1",
-    api_key=api_key,
-    default_headers={
-        "HTTP-Referer": "https://github.com/yourusername/MarketPulse",
-        "X-Title": "MarketPulse"
-    }
-)
+client = genai.Client(api_key=api_key)
 
 # =====================================================================
 # MODULE 2 — UNIVERSE LOADER
@@ -68,13 +66,14 @@ def load_nse_universe() -> Tuple[Dict[str, str], str]:
 # MODULE 3 — PROMPT BUILDER
 # =====================================================================
 def build_prompt(title: str, article: str, company_block: str) -> str:
-    # 🎯 UPDATED PROMPT: Added strict gainers/losers exclusion rules
     return f"""
-You are a financial entity resolution system.
+You are an expert Indian equity research analyst.
+You are given:
+An article title.
+An article body.
+The complete NSE company universe.
 
-NSE COMPANY UNIVERSE
-====================
-{company_block}
+Your task is to identify ONLY the materially relevant NSE-listed companies discussed in the article.
 
 ARTICLE TITLE
 =============
@@ -84,34 +83,89 @@ ARTICLE BODY
 ============
 {article}
 
-TASK
-====
-Select ONLY companies from the NSE COMPANY UNIVERSE that are materially relevant.
+NSE COMPANY UNIVERSE
+====================
+{company_block}
 
-Material relevance includes:
-- earnings/results
-- guidance
-- contracts
-- acquisitions
-- operations
-- company-specific developments
-- major market-moving discussion
+REASONING PROCESS (MANDATORY)
+Step 1: Identify all companies explicitly mentioned in the title or article body.
+Step 2: For each mentioned company, determine whether it is materially relevant.
+A company is materially relevant if ANY of the following are discussed:
+• Quarterly or annual earnings/results
+• Revenue, profit, margins, guidance
+• Business operations or strategy
+• Acquisitions, mergers, investments
+• New projects, contracts, orders
+• Capacity expansion
+• Regulatory developments affecting the company
+• Fund raising, stake sale, promoter activity
+• Significant management commentary
+• Major company-specific developments
+• The company is the primary subject of the article
 
-RULES
-1. Select ONLY from the NSE COMPANY UNIVERSE.
-2. Return exact company names exactly as written in the NSE COMPANY UNIVERSE.
-3. Return the exact NSE company entity corresponding to companies discussed in the article (do not return journalistic shorthand).
-4. Do not return aliases or tickers.
-5. Do not return brokers, analysts, exchanges, sectors, or indices.
-6. The article title often indicates the primary company. Give strong weight to companies explicitly discussed in the title, but also include other materially discussed companies from the article body.
-7. Do NOT include companies merely listed as gainers, losers, volume movers, constituents, or examples unless the article contains detailed, company-specific discussion about them.
-8. Return every materially discussed company.
-9. If none qualify, return an empty list.
+Step 3: Assign each company a confidence level (HIGH, MEDIUM, LOW).
+- HIGH: Article is primarily about the company.
+- MEDIUM: Company has material discussion but is not the main subject.
+- LOW: Mentioned in passing, peer comparison, market roundup, stock movers list, analyst example, sector commentary.
 
-OUTPUT
+Step 4 (Final Verification): For every company marked HIGH or MEDIUM, ask:
+"Would removing this company materially change the meaning of the article?"
+If NO: Downgrade to LOW.
+If YES: Keep as HIGH/MEDIUM.
+
+Step 5: Match the relevant companies against the provided NSE universe.
+
+IMPORTANT RULES
+- A company MUST be explicitly mentioned.
+- Give highest weight to companies appearing in the title.
+- For market commentary, market wrap, market mood, technical analysis, index movement, F&O, Nifty, Sensex, Mid-day Mood, Taking Stock, Opening Bell, Closing Bell, or market summary articles: DO NOT return companies merely because they are mentioned. Return them ONLY if company-specific earnings, guidance, business developments, management commentary, or corporate actions are discussed.
+- Do NOT infer companies from sectors, themes, or macro commentary.
+- Return ONLY exact names that exist in the provided NSE universe.
+
+EXAMPLES
+Example 1 (Earnings)
+Title: REC Q4 results: Net profit climbs 33%
+Article: REC reported net profit of Rs 4,079 crore...
+Output:
 {{
-  "companies": []
+  "candidates": [
+    {{"company": "REC Limited", "relevance": "HIGH"}}
+  ]
 }}
+
+Example 2 (Market Wrap - Negative Example)
+Title: Mid-day Mood | Nifty gains 200 points
+Article: HDFC Bank, ICICI Bank, Reliance and Infosys supported the rally today amid strong global cues.
+Output:
+{{
+  "candidates": []
+}}
+
+Example 3 (F&O Commentary - Negative Example)
+Title: F&O Manual | Bank Nifty faces resistance
+Article: Analysts discuss Nifty and Bank Nifty levels. HDFC Bank might see some pressure.
+Output:
+{{
+  "candidates": [
+    {{"company": "HDFC Bank Limited", "relevance": "LOW"}}
+  ]
+}}
+
+Example 4 (Sector with one material standout)
+Title: Q4 earnings: Positive surprises from banking majors
+Article: ICICI Bank, Axis Bank, HDFC Bank and IndusInd Bank delivered strong results. ICICI specifically announced a major new acquisition.
+Output:
+{{
+  "candidates": [
+    {{"company": "ICICI Bank Limited", "relevance": "HIGH"}},
+    {{"company": "Axis Bank Limited", "relevance": "MEDIUM"}},
+    {{"company": "HDFC Bank Limited", "relevance": "MEDIUM"}},
+    {{"company": "IndusInd Bank Limited", "relevance": "MEDIUM"}}
+  ]
+}}
+
+OUTPUT FORMAT
+Return ONLY valid JSON containing the "candidates" array.
 """
 
 # =====================================================================
@@ -132,16 +186,19 @@ def extract_companies(title: str, article: str, company_block: str) -> Tuple[Lis
     for attempt in range(CONFIG["MAX_RETRIES"]):
         try:
             start_time = time.time()
-            res = client.chat.completions.create(
+            
+            # 🎯 Generate content using the new SDK syntax
+            response = client.models.generate_content(
                 model=CONFIG["MODEL"],
-                temperature=0.0,
-                messages=[
-                    {"role": "system", "content": "Return valid JSON only. Do not output markdown or any conversational text."},
-                    {"role": "user", "content": prompt}
-                ]
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    temperature=0.0,
+                    response_mime_type="application/json"
+                ),
             )
+            
             latency = time.time() - start_time
-            raw_text = res.choices[0].message.content.strip()
+            raw_text = response.text.strip()
             
             raw_json = raw_text
             if raw_json.startswith("```json"):
@@ -151,10 +208,21 @@ def extract_companies(title: str, article: str, company_block: str) -> Tuple[Lis
                 
             parsed = json.loads(raw_json)
             
-            if isinstance(parsed, dict) and "companies" in parsed and isinstance(parsed["companies"], list):
-                return parsed["companies"], latency, raw_text, prompt_size_chars, "SUCCESS"
+            # Filter strictly for HIGH and MEDIUM relevance
+            valid_companies = []
+            if isinstance(parsed, dict) and "candidates" in parsed:
+                for candidate in parsed["candidates"]:
+                    relevance = candidate.get("relevance", "").upper()
+                    company_name = candidate.get("company", "")
+                    
+                    if relevance in ["HIGH", "MEDIUM"] and company_name:
+                        valid_companies.append(company_name)
+                        
+                return valid_companies, latency, raw_text, prompt_size_chars, "SUCCESS"
             else:
-                raise ValueError("Malformed JSON output: missing 'companies' list.")
+                if "companies" in parsed:
+                     return parsed["companies"], latency, raw_text, prompt_size_chars, "SUCCESS"
+                raise ValueError("Malformed JSON output: missing 'candidates' array.")
             
         except Exception as e:
             logging.warning(f"API Error (Attempt {attempt+1}): {e}. Retrying in 15s...")
@@ -234,7 +302,7 @@ def run_benchmark_scoring():
         
         pd.DataFrame(breakdown_rows).to_csv(CONFIG["BENCHMARK_BREAKDOWN_FILE"], index=False)
         
-        logging.info("=== BENCHMARK: PURE LLM ARCHITECTURE ===")
+        logging.info("=== BENCHMARK: PURE LLM ARCHITECTURE (GEMINI) ===")
         logging.info(f"Rows Evaluated: {len(eval_df)}")
         logging.info(f"Precision: {precision:.4f}")
         logging.info(f"Recall:    {recall:.4f}")
@@ -300,9 +368,22 @@ def process_batch():
             
         mapped_names, mapped_tickers, discarded = map_tickers(extracted, ticker_lookup)
         
+        try:
+            safe_json = json.dumps(json.loads(raw_json)) if raw_json else ""
+        except Exception as e:
+            logging.warning(f"Row {idx} | JSON parse failed, falling back to string strip: {e}")
+            safe_json = str(raw_json).replace("\n", " ").replace("\r", "")
+            
+        safe_article = str(article).replace("\n", " ").replace("\r", "")
+        
         out_dict = {
-            "row_id": idx, "title": title, "date_published": date_published,
-            "mapped_companies": ",".join(mapped_names), "mapped_tickers": ",".join(mapped_tickers),
+            "row_id": idx, 
+            "title": title, 
+            "date_published": date_published,
+            "article_text": safe_article,
+            "raw_llm_output": safe_json,
+            "mapped_companies": ",".join(mapped_names), 
+            "mapped_tickers": ",".join(mapped_tickers),
             "company_count": len(mapped_tickers)
         }
         
@@ -313,7 +394,7 @@ def process_batch():
             "prompt_size_chars": prompt_size, "article_chars": len(article),
             "raw_extracted": ",".join(extracted), "mapped_companies": ",".join(mapped_names),
             "mapped_tickers": ",".join(mapped_tickers), "discarded_entities": ",".join(discarded),
-            "raw_llm_json": raw_json
+            "raw_llm_json": safe_json
         }
         
         append_with_dedup(CONFIG["OUTPUT_FILE"], out_dict, subset=["title", "date_published"])
